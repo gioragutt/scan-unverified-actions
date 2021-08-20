@@ -16,7 +16,9 @@ const outputMapping: Record<VerificationResult, string> = {
 async function main() {
   const workflowsPath = core.getInput('workflows-dir');
 
+  console.log();
   console.log('🔎 Scanning for unverified actions', workflowsPath);
+  console.log();
 
   const workflows = await readWorkflows(workflowsPath);
 
@@ -29,10 +31,9 @@ async function main() {
     '📆 Found workflows',
     workflows.map(w => w.filename)
   );
+  console.log();
 
   const {actionNames, actionsToJobs} = parseWorkflowFiles(workflows);
-
-  console.log('🛠 Found actions', actionNames);
 
   const categorized = await actionNames.reduce(async (acc, name) => {
     const output = await acc;

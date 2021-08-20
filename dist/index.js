@@ -6300,15 +6300,17 @@ function main() {
     var _a;
     return src_awaiter(this, void 0, void 0, function* () {
         const workflowsPath = core.getInput('workflows-dir');
+        console.log();
         console.log('🔎 Scanning for unverified actions', workflowsPath);
+        console.log();
         const workflows = yield readWorkflows(workflowsPath);
         if (!workflows.length) {
             core.setFailed(`No workflows found in ${workflowsPath}`);
             return;
         }
         console.log('📆 Found workflows', workflows.map(w => w.filename));
+        console.log();
         const { actionNames, actionsToJobs } = parseWorkflowFiles(workflows);
-        console.log('🛠 Found actions', actionNames);
         const categorized = yield actionNames.reduce((acc, name) => src_awaiter(this, void 0, void 0, function* () {
             var _b;
             const output = yield acc;
