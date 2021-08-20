@@ -64,7 +64,10 @@ describe('readWorkflows', () => {
       filename: 'flow.yml',
       content: {
         jobs: {
-          job: {
+          ci: {
+            steps: expect.any(Array),
+          },
+          sanity: {
             steps: expect.any(Array),
           },
         },
