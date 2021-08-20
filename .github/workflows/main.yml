@@ -1,22 +1,23 @@
+name: Find Unverified Actions
+
 on:
   workflow_dispatch:
 
 jobs:
-  hello_world_job:
+  job:
     runs-on: ubuntu-latest
-    name: A job to say hello
+    name: Find unverified actions
     steps:
       # To use this repository's private action,
       # you must check out the repository
       - name: Checkout
         uses: actions/checkout@v2
       
-      - name: Hello world action step
+      - name: Find unverified actions
         uses: ./ # Uses an action in the root directory
         id: hello
-        with:
-          who-to-greet: 'Mona the Octocat'
-      
-          # Use the output from the `hello` step
-      - name: Get the output time
-        run: echo "The time was ${{ steps.hello.outputs.time }}"
+
+      - name: Print output
+        run: |
+          echo "Found? ${{ steps.hello.outputs.found-verified-actions }}"
+          echo "Output ${{ steps.hello.outputs.unverified-actions }}"

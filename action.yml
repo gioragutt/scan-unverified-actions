@@ -1,13 +1,10 @@
-name: 'Hello World'
-description: 'Greet someone and record the time'
-inputs:
-  who-to-greet:  # id of input
-    description: 'Who to greet'
-    required: true
-    default: 'World'
+name: Find unverified Github Actions
+description: Scans your Github Actions Workflows for unverified actions
 outputs:
-  time: # id of output
-    description: 'The time we greeted you'
+  found-verified-actions:
+    description: Whether ot not unverified actions are found to be used
+  unverified-actions:
+    description: JSON array of unverified actions found to be used
 runs:
   using: 'node12'
   main: 'dist/index.js'
