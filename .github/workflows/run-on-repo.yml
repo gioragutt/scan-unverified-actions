@@ -20,7 +20,7 @@ jobs:
           repository: ${{ github.event.inputs.repo }}
 
       - name: Find unverified actions
-        uses: gioragutt/scan-unverified-actions@v1
+        uses: gioragutt/scan-unverified-actions@main
         id: scan
 
       - name: Print output
