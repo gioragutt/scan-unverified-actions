@@ -4,7 +4,9 @@ This action scans actions used in your workflow files and outputs those that are
 
 ## Inputs
 
-`scan-unverified-actions` has no inputs.
+|      Name       |   Type   | Required |       Default       |         Description         |
+| :-------------: | :------: | :------: | :-----------------: | :-------------------------: |
+| `workflows-dir` | `string` |    ✅    | `.github/workflows` | Path to workflows directory |
 
 ## Outputs
 

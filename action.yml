@@ -3,6 +3,11 @@ description: Scans your Github Actions Workflows for unverified actions
 branding:
   icon: bell
   color: orange
+inputs:
+  workflows-dir:
+    default: .github/workflows
+    required: true
+    description: Path to a workflows directory to scan
 outputs:
   found-verified-actions:
     description: Whether or not unverified actions were found
