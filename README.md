@@ -35,3 +35,30 @@ jobs:
           echo "Found? ${{ steps.scan.outputs.found-verified-actions }}"
           echo "Output ${{ steps.scan.outputs.unverified-actions }}"
 ```
+
+# Development
+
+First, fork the repo.
+
+```bash
+# Install dependencies after cloning
+yarn
+
+# Lint the code
+yarn lint
+yarn lint --fix
+
+# Test the code
+yarn test
+
+# Bundle dist
+yarn bundle
+```
+
+## Deployment
+
+To deploy, make whatever code changes you want, followed by:
+
+```bash
+./deploy.sh "commit message"
+```
