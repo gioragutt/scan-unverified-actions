@@ -16,12 +16,12 @@ jobs:
 
       - name: Find unverified actions
         uses: ./ # Uses an action in the root directory
-        id: hello
+        id: scan
 
       - name: Print output
         run: |
-          echo "Found? ${{ steps.hello.outputs.found-verified-actions }}"
-          echo "Output ${{ steps.hello.outputs.unverified-actions }}"
+          echo "Found? ${{ steps.scan.outputs.found-verified-actions }}"
+          echo "Output ${{ steps.scan.outputs.unverified-actions }}"
 
       # This is an unverified action
       - name: Read package.json

@@ -2,9 +2,9 @@ name: Find unverified Github Actions
 description: Scans your Github Actions Workflows for unverified actions
 outputs:
   found-verified-actions:
-    description: Whether ot not unverified actions are found to be used
+    description: Whether or not unverified actions were found
   unverified-actions:
-    description: JSON array of unverified actions found to be used
+    description: JSON array of unverified actions found
 runs:
   using: 'node12'
   main: 'dist/index.js'
