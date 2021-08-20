@@ -1,8 +1,9 @@
 import * as core from '@actions/core';
 import * as github from '@actions/github';
-import {readdir, readFile} from 'fs/promises';
-import {join} from 'path';
+import {promises as fs} from 'fs';
 import {load} from 'js-yaml';
+import fetch from 'node-fetch';
+import {join} from 'path';
 
 const WORKFLOWS = './github/workflows';
 
@@ -27,14 +28,14 @@ interface WorkflowFile {
 }
 
 async function readWorkflows() {
-  const files = await readdir(WORKFLOWS);
+  const files = await fs.readdir(WORKFLOWS);
   const workflows = files.filter(
     f => f.endsWith('.yaml') || f.endsWith('.yml')
   );
   return await workflows.reduce(async (acc, filename) => {
     const output = await acc;
     const content = load(
-      await readFile(join(WORKFLOWS, filename), 'utf-8')
+      await fs.readFile(join(WORKFLOWS, filename), 'utf-8')
     ) as WorkflowFile['content'];
     output.push({
       filename,

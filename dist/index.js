@@ -6305,6 +6305,35 @@ module.exports = require("zlib");
 /******/ 	}
 /******/ 	
 /************************************************************************/
+/******/ 	/* webpack/runtime/compat get default export */
+/******/ 	(() => {
+/******/ 		// getDefaultExport function for compatibility with non-harmony modules
+/******/ 		__nccwpck_require__.n = (module) => {
+/******/ 			var getter = module && module.__esModule ?
+/******/ 				() => (module['default']) :
+/******/ 				() => (module);
+/******/ 			__nccwpck_require__.d(getter, { a: getter });
+/******/ 			return getter;
+/******/ 		};
+/******/ 	})();
+/******/ 	
+/******/ 	/* webpack/runtime/define property getters */
+/******/ 	(() => {
+/******/ 		// define getter functions for harmony exports
+/******/ 		__nccwpck_require__.d = (exports, definition) => {
+/******/ 			for(var key in definition) {
+/******/ 				if(__nccwpck_require__.o(definition, key) && !__nccwpck_require__.o(exports, key)) {
+/******/ 					Object.defineProperty(exports, key, { enumerable: true, get: definition[key] });
+/******/ 				}
+/******/ 			}
+/******/ 		};
+/******/ 	})();
+/******/ 	
+/******/ 	/* webpack/runtime/hasOwnProperty shorthand */
+/******/ 	(() => {
+/******/ 		__nccwpck_require__.o = (obj, prop) => (Object.prototype.hasOwnProperty.call(obj, prop))
+/******/ 	})();
+/******/ 	
 /******/ 	/* webpack/runtime/make namespace object */
 /******/ 	(() => {
 /******/ 		// define __esModule on exports
@@ -6332,10 +6361,8 @@ __nccwpck_require__.r(__webpack_exports__);
 var core = __nccwpck_require__(186);
 // EXTERNAL MODULE: ./node_modules/@actions/github/lib/github.js
 var github = __nccwpck_require__(438);
-;// CONCATENATED MODULE: external "fs/promises"
-const promises_namespaceObject = require("fs/promises");
-// EXTERNAL MODULE: external "path"
-var external_path_ = __nccwpck_require__(622);
+// EXTERNAL MODULE: external "fs"
+var external_fs_ = __nccwpck_require__(747);
 ;// CONCATENATED MODULE: ./node_modules/js-yaml/dist/js-yaml.mjs
 
 /*! js-yaml 4.1.0 https://github.com/nodeca/js-yaml @license MIT */
@@ -10189,6 +10216,11 @@ var jsYaml = {
 /* harmony default export */ const js_yaml = ((/* unused pure expression or super */ null && (jsYaml)));
 
 
+// EXTERNAL MODULE: ./node_modules/node-fetch/lib/index.js
+var lib = __nccwpck_require__(467);
+var lib_default = /*#__PURE__*/__nccwpck_require__.n(lib);
+// EXTERNAL MODULE: external "path"
+var external_path_ = __nccwpck_require__(622);
 ;// CONCATENATED MODULE: ./index.ts
 var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _arguments, P, generator) {
     function adopt(value) { return value instanceof P ? value : new P(function (resolve) { resolve(value); }); }
@@ -10204,14 +10236,15 @@ var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _argume
 
 
 
+
 const WORKFLOWS = './github/workflows';
 function readWorkflows() {
     return __awaiter(this, void 0, void 0, function* () {
-        const files = yield (0,promises_namespaceObject.readdir)(WORKFLOWS);
+        const files = yield external_fs_.promises.readdir(WORKFLOWS);
         const workflows = files.filter(f => f.endsWith('.yaml') || f.endsWith('.yml'));
         return yield workflows.reduce((acc, filename) => __awaiter(this, void 0, void 0, function* () {
             const output = yield acc;
-            const content = load(yield (0,promises_namespaceObject.readFile)((0,external_path_.join)(WORKFLOWS, filename), 'utf-8'));
+            const content = load(yield external_fs_.promises.readFile((0,external_path_.join)(WORKFLOWS, filename), 'utf-8'));
             output.push({
                 filename,
                 content,
@@ -10223,7 +10256,7 @@ function readWorkflows() {
 function isUnverifiedAction(action) {
     return __awaiter(this, void 0, void 0, function* () {
         const actionName = action.split('@')[0];
-        const html = yield fetch(`https://github.com/marketplace/${actionName}`).then(r => r.text());
+        const html = yield lib_default()(`https://github.com/marketplace/${actionName}`).then(r => r.text());
         return !html.includes('GitHub has verified that this action was created by');
     });
 }
