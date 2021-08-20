@@ -4,17 +4,18 @@ import {isUnverifiedAction, parseWorkflowFiles, readWorkflows} from './utils';
 async function main() {
   const workflowsPath = core.getInput('workflows-dir');
 
-  core.info(`🔎 Scanning for unverified actions in ${workflowsPath}`);
+  console.log('🔎 Scanning for unverified actions', workflowsPath);
 
   const workflows = await readWorkflows(workflowsPath);
 
-  core.debug(
-    `📆 Found workflows: ${workflows.map(w => w.filename).join(', ')}`
+  console.log(
+    '📆 Found workflows',
+    workflows.map(w => w.filename)
   );
 
   const {actionNames, actionsToJobs} = parseWorkflowFiles(workflows);
 
-  core.debug(`🛠 Found actions: ${actionNames.join(', ')}`);
+  console.log('🛠 Found actions', actionNames);
 
   const unverifiedActions = await actionNames.reduce(async (acc, name) => {
     const output = await acc;
@@ -25,7 +26,7 @@ async function main() {
   }, Promise.resolve([] as string[]));
 
   if (unverifiedActions.length) {
-    core.info(`❌ Found unverified actions: ${unverifiedActions.join(', ')}`);
+    console.log('❌ Found unverified actions', unverifiedActions);
     console.log();
 
     const tableData = unverifiedActions.flatMap(action =>
@@ -38,7 +39,7 @@ async function main() {
 
     console.table(tableData);
   } else {
-    console.info('✅ No unverified actions found!');
+    console.log('✅ No unverified actions found!');
   }
 
   core.setOutput('found-verified-actions', unverifiedActions.length > 0);

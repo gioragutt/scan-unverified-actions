@@ -6288,11 +6288,11 @@ var src_awaiter = (undefined && undefined.__awaiter) || function (thisArg, _argu
 function main() {
     return src_awaiter(this, void 0, void 0, function* () {
         const workflowsPath = core.getInput('workflows-dir');
-        core.info(`🔎 Scanning for unverified actions in ${workflowsPath}`);
+        console.log('🔎 Scanning for unverified actions', workflowsPath);
         const workflows = yield readWorkflows(workflowsPath);
-        core.debug(`📆 Found workflows: ${workflows.map(w => w.filename).join(', ')}`);
+        console.log('📆 Found workflows', workflows.map(w => w.filename));
         const { actionNames, actionsToJobs } = parseWorkflowFiles(workflows);
-        core.debug(`🛠 Found actions: ${actionNames.join(', ')}`);
+        console.log('🛠 Found actions', actionNames);
         const unverifiedActions = yield actionNames.reduce((acc, name) => src_awaiter(this, void 0, void 0, function* () {
             const output = yield acc;
             if (yield isUnverifiedAction(name)) {
@@ -6301,7 +6301,7 @@ function main() {
             return output;
         }), Promise.resolve([]));
         if (unverifiedActions.length) {
-            core.info(`❌ Found unverified actions: ${unverifiedActions.join(', ')}`);
+            console.log('❌ Found unverified actions', unverifiedActions);
             console.log();
             const tableData = unverifiedActions.flatMap(action => actionsToJobs[action].flatMap(({ filename, job }) => ({
                 action,
@@ -6311,7 +6311,7 @@ function main() {
             console.table(tableData);
         }
         else {
-            console.info('✅ No unverified actions found!');
+            console.log('✅ No unverified actions found!');
         }
         core.setOutput('found-verified-actions', unverifiedActions.length > 0);
         core.setOutput('unverified-actions', unverifiedActions);
