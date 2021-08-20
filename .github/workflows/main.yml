@@ -1,4 +1,4 @@
-name: Find Unverified Actions
+name: CI
 
 on:
   push:
@@ -29,6 +29,3 @@ jobs:
         uses: juliangruber/read-file-action@v1
         with:
           path: ./package.json
-
-      - name: Echo package.json
-        run: echo "${{ steps.package.outputs.content }}"

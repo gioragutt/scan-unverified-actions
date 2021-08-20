@@ -1,7 +1,6 @@
-name: Find Unverified Actions
+name: Scan repository
 
 on:
-  push:
   workflow_dispatch:
     inputs:
       repo:
@@ -21,7 +20,7 @@ jobs:
           repository: ${{ github.event.inputs.repo }}
 
       - name: Find unverified actions
-        uses: gioragutt/scan-unverified-actions@1
+        uses: gioragutt/scan-unverified-actions@v1
         id: scan
 
       - name: Print output
