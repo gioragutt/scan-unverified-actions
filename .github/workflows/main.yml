@@ -22,3 +22,13 @@ jobs:
         run: |
           echo "Found? ${{ steps.hello.outputs.found-verified-actions }}"
           echo "Output ${{ steps.hello.outputs.unverified-actions }}"
+
+      # This is an unverified action
+      - name: Read package.json
+        id: package
+        uses: juliangruber/read-file-action@v1
+        with:
+          path: ./package.json
+
+      - name: Echo package.json
+        run: echo "${{ steps.package.outputs.content }}"
