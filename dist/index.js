@@ -6197,6 +6197,7 @@ var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _argume
 
 
 
+const isRelativePathRegex = /^(.\/|..\/)+/;
 const viewOnMarketplaceRegex = /<a.*href="\/marketplace\/(.*)".*>View on Marketplace<\/a>/;
 const isValidResponse = (status) => status >= 200 && status < 300;
 function checkActionOnMarketplace(action) {
@@ -6214,7 +6215,8 @@ function checkActionOnMarketplace(action) {
 function checkVerification(actionName) {
     var _a;
     return __awaiter(this, void 0, void 0, function* () {
-        if (actionName.split('/').length > 2) {
+        if (actionName.split('/').length > 2 ||
+            isRelativePathRegex.test(actionName)) {
             return 'custom-action';
         }
         const marketplaceCheck = yield checkActionOnMarketplace(actionName);

@@ -4,6 +4,8 @@ import fetch from 'node-fetch';
 import {join} from 'path';
 import {WorkflowFile, WorkflowSyntax} from './types';
 
+const isRelativePathRegex = /^(.\/|..\/)+/;
+
 const viewOnMarketplaceRegex =
   /<a.*href="\/marketplace\/(.*)".*>View on Marketplace<\/a>/;
 
@@ -36,7 +38,10 @@ async function checkActionOnMarketplace(
 export async function checkVerification(
   actionName: string
 ): Promise<VerificationResult> {
-  if (actionName.split('/').length > 2) {
+  if (
+    actionName.split('/').length > 2 ||
+    isRelativePathRegex.test(actionName)
+  ) {
     return 'custom-action';
   }
 

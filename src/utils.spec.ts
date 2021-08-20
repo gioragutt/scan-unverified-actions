@@ -17,6 +17,7 @@ describe('checkVerification', () => {
     ${'actions/setup-node'}                                      | ${'verified'}
     ${'gioragutt/scan-unverified-actions'}                       | ${'unverified'}
     ${'angular/dev-infra/github-actions/breaking-changes-label'} | ${'custom-action'}
+    ${'./'}                                                      | ${'custom-action'}
   `(`$action is $result`, async ({action, result}) => {
     expect(await checkVerification(action)).toBe(result);
   });
