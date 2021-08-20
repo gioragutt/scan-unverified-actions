@@ -1,5 +1,7 @@
 name: Find unverified Github Actions
 description: Scans your Github Actions Workflows for unverified actions
+icon: bell
+color: orange
 outputs:
   found-verified-actions:
     description: Whether or not unverified actions were found
