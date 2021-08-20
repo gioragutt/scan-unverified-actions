@@ -1,5 +1,17 @@
 import * as core from '@actions/core';
-import {isUnverifiedAction, parseWorkflowFiles, readWorkflows} from './utils';
+import {
+  checkVerification,
+  parseWorkflowFiles,
+  readWorkflows,
+  VerificationResult,
+} from './utils';
+
+const outputMapping: Record<VerificationResult, string> = {
+  verified: 'verified-actions',
+  unverified: 'unverified-actions',
+  'custom-action': 'custom-actions',
+  'not-found': 'unknown-actions',
+};
 
 async function main() {
   const workflowsPath = core.getInput('workflows-dir');
@@ -7,6 +19,11 @@ async function main() {
   console.log('🔎 Scanning for unverified actions', workflowsPath);
 
   const workflows = await readWorkflows(workflowsPath);
+
+  if (!workflows.length) {
+    core.setFailed(`No workflows found in ${workflowsPath}`);
+    return;
+  }
 
   console.log(
     '📆 Found workflows',
@@ -17,19 +34,29 @@ async function main() {
 
   console.log('🛠 Found actions', actionNames);
 
-  const unverifiedActions = await actionNames.reduce(async (acc, name) => {
+  const categorized = await actionNames.reduce(async (acc, name) => {
     const output = await acc;
-    if (await isUnverifiedAction(name)) {
-      output.push(name);
-    }
+    const result = await checkVerification(name);
+    output[result] = output[result] ?? [];
+    output[result].push(name);
     return output;
-  }, Promise.resolve([] as string[]));
+  }, Promise.resolve({} as Partial<Record<VerificationResult, string[]>>));
 
-  if (unverifiedActions.length) {
-    console.log('❌ Found unverified actions', unverifiedActions);
+  console.log('📊 Scanner result summary:');
+
+  for (const [category, outputName] of Object.entries(outputMapping)) {
+    const actions = categorized[category as VerificationResult];
+    const message = actions ? actions.join(', ') : 'no such actions';
+    console.log(` - ${`${outputName}:`.padEnd(19)}`, message);
+  }
+
+  console.log();
+
+  if (categorized.unverified) {
+    console.log('❌ Found unverified actions', categorized.unverified);
     console.log();
 
-    const tableData = unverifiedActions.flatMap(action =>
+    const tableData = categorized.unverified.flatMap(action =>
       actionsToJobs[action].flatMap(({filename, job}) => ({
         action,
         workflow: filename,
@@ -42,8 +69,10 @@ async function main() {
     console.log('✅ No unverified actions found!');
   }
 
-  core.setOutput('found-verified-actions', unverifiedActions.length > 0);
-  core.setOutput('unverified-actions', unverifiedActions);
+  core.setOutput('found-unverified-actions', !!categorized.unverified);
+  for (const [category, outputName] of Object.entries(outputMapping)) {
+    core.setOutput(outputName, categorized[category] ?? []);
+  }
 }
 
 main().catch(err => {

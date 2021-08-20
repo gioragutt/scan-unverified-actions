@@ -9,46 +9,56 @@ const viewOnMarketplaceRegex =
 
 const isValidResponse = (status: number) => status >= 200 && status < 300;
 
-type TriBool = true | false | null;
+export type VerificationResult =
+  | 'verified'
+  | 'unverified'
+  | 'not-found'
+  | 'custom-action';
 
-async function checkActionOnMarketplace(action: string): Promise<TriBool> {
+async function checkActionOnMarketplace(
+  action: string
+): Promise<VerificationResult> {
   const marketplaceResponse = await fetch(
     `https://github.com/marketplace/${action}`
   );
 
   if (!isValidResponse(marketplaceResponse.status)) {
-    return null;
+    return 'not-found';
   }
 
   const html = await marketplaceResponse.text();
 
-  return html.includes('GitHub has verified that this action was created by');
+  return html.includes('GitHub has verified that this action was created by')
+    ? 'verified'
+    : 'unverified';
 }
 
-export async function isUnverifiedAction(action: string): Promise<TriBool> {
-  const actionName = action.split('@')[0];
+export async function checkVerification(
+  actionName: string
+): Promise<VerificationResult> {
+  if (actionName.split('/').length > 2) {
+    return 'custom-action';
+  }
 
   const marketplaceCheck = await checkActionOnMarketplace(actionName);
 
-  if (marketplaceCheck !== null) {
-    return !marketplaceCheck;
+  if (marketplaceCheck !== 'not-found') {
+    return marketplaceCheck;
   }
 
   const repoResponse = await fetch(`https://github.com/${actionName}`);
   if (!isValidResponse(repoResponse.status)) {
-    return null;
+    return 'not-found';
   }
 
   const html = await repoResponse.text();
   const [, realActionName] = html.match(viewOnMarketplaceRegex) ?? [];
 
   if (!realActionName) {
-    return null;
+    return 'not-found';
   }
 
-  const realMarketplaceCheck = await checkActionOnMarketplace(realActionName);
-
-  return realMarketplaceCheck === null ? null : !realMarketplaceCheck;
+  return await checkActionOnMarketplace(realActionName);
 }
 
 export async function readWorkflows(path: string) {

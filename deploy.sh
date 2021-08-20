@@ -7,4 +7,4 @@ git add -A
 git commit -m "$MESSAGE"
 git tag -f v1
 
-git push --atomic origin main v1
+git push --force --atomic origin main v1

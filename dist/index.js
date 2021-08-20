@@ -6203,31 +6203,34 @@ function checkActionOnMarketplace(action) {
     return __awaiter(this, void 0, void 0, function* () {
         const marketplaceResponse = yield lib_default()(`https://github.com/marketplace/${action}`);
         if (!isValidResponse(marketplaceResponse.status)) {
-            return null;
+            return 'not-found';
         }
         const html = yield marketplaceResponse.text();
-        return html.includes('GitHub has verified that this action was created by');
+        return html.includes('GitHub has verified that this action was created by')
+            ? 'verified'
+            : 'unverified';
     });
 }
-function isUnverifiedAction(action) {
+function checkVerification(actionName) {
     var _a;
     return __awaiter(this, void 0, void 0, function* () {
-        const actionName = action.split('@')[0];
+        if (actionName.split('/').length > 2) {
+            return 'custom-action';
+        }
         const marketplaceCheck = yield checkActionOnMarketplace(actionName);
-        if (marketplaceCheck !== null) {
-            return !marketplaceCheck;
+        if (marketplaceCheck !== 'not-found') {
+            return marketplaceCheck;
         }
         const repoResponse = yield lib_default()(`https://github.com/${actionName}`);
         if (!isValidResponse(repoResponse.status)) {
-            return null;
+            return 'not-found';
         }
         const html = yield repoResponse.text();
         const [, realActionName] = (_a = html.match(viewOnMarketplaceRegex)) !== null && _a !== void 0 ? _a : [];
         if (!realActionName) {
-            return null;
+            return 'not-found';
         }
-        const realMarketplaceCheck = yield checkActionOnMarketplace(realActionName);
-        return realMarketplaceCheck === null ? null : !realMarketplaceCheck;
+        return yield checkActionOnMarketplace(realActionName);
     });
 }
 function readWorkflows(path) {
@@ -6285,25 +6288,44 @@ var src_awaiter = (undefined && undefined.__awaiter) || function (thisArg, _argu
 };
 
 
+const outputMapping = {
+    verified: 'verified-actions',
+    unverified: 'unverified-actions',
+    'custom-action': 'custom-actions',
+    'not-found': 'unknown-actions',
+};
 function main() {
+    var _a;
     return src_awaiter(this, void 0, void 0, function* () {
         const workflowsPath = core.getInput('workflows-dir');
         console.log('🔎 Scanning for unverified actions', workflowsPath);
         const workflows = yield readWorkflows(workflowsPath);
+        if (!workflows.length) {
+            core.setFailed(`No workflows found in ${workflowsPath}`);
+            return;
+        }
         console.log('📆 Found workflows', workflows.map(w => w.filename));
         const { actionNames, actionsToJobs } = parseWorkflowFiles(workflows);
         console.log('🛠 Found actions', actionNames);
-        const unverifiedActions = yield actionNames.reduce((acc, name) => src_awaiter(this, void 0, void 0, function* () {
+        const categorized = yield actionNames.reduce((acc, name) => src_awaiter(this, void 0, void 0, function* () {
+            var _b;
             const output = yield acc;
-            if (yield isUnverifiedAction(name)) {
-                output.push(name);
-            }
+            const result = yield checkVerification(name);
+            output[result] = (_b = output[result]) !== null && _b !== void 0 ? _b : [];
+            output[result].push(name);
             return output;
-        }), Promise.resolve([]));
-        if (unverifiedActions.length) {
-            console.log('❌ Found unverified actions', unverifiedActions);
+        }), Promise.resolve({}));
+        console.log('📊 Scanner result summary:');
+        for (const [category, outputName] of Object.entries(outputMapping)) {
+            const actions = categorized[category];
+            const message = actions ? actions.join(', ') : 'no such actions';
+            console.log(` - ${`${outputName}:`.padEnd(19)}`, message);
+        }
+        console.log();
+        if (categorized.unverified) {
+            console.log('❌ Found unverified actions', categorized.unverified);
             console.log();
-            const tableData = unverifiedActions.flatMap(action => actionsToJobs[action].flatMap(({ filename, job }) => ({
+            const tableData = categorized.unverified.flatMap(action => actionsToJobs[action].flatMap(({ filename, job }) => ({
                 action,
                 workflow: filename,
                 job,
@@ -6313,8 +6335,10 @@ function main() {
         else {
             console.log('✅ No unverified actions found!');
         }
-        core.setOutput('found-verified-actions', unverifiedActions.length > 0);
-        core.setOutput('unverified-actions', unverifiedActions);
+        core.setOutput('found-unverified-actions', !!categorized.unverified);
+        for (const [category, outputName] of Object.entries(outputMapping)) {
+            core.setOutput(outputName, (_a = categorized[category]) !== null && _a !== void 0 ? _a : []);
+        }
     });
 }
 main().catch(err => {

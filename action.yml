@@ -9,10 +9,16 @@ inputs:
     required: true
     description: Path to a workflows directory to scan
 outputs:
-  found-verified-actions:
+  found-unverified-actions:
     description: Whether or not unverified actions were found
+  verified-actions:
+    description: JSON array of the verified actions found
   unverified-actions:
-    description: JSON array of unverified actions found
+    description: JSON array of the unverified actions found
+  custom-actions:
+    description: JSON array of the custom actions found
+  unknown-actions:
+    description: JSON array of actions the scanner couldn't understand
 runs:
   using: 'node12'
   main: 'dist/index.js'

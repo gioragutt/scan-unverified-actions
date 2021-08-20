@@ -10,10 +10,13 @@ This action scans actions used in your workflow files and outputs those that are
 
 ## Outputs
 
-|           Name           |    Type    |                 Description                  |
-| :----------------------: | :--------: | :------------------------------------------: |
-| `found-verified-actions` | `boolean`  | Whether or not unverified actions were found |
-|   `unverified-actions`   | JSON Array |         The unverified actions found         |
+|            Name            |    Type    |                 Description                  |
+| :------------------------: | :--------: | :------------------------------------------: |
+| `found-unverified-actions` | `boolean`  | whether or not unverified actions were found |
+|     `verified-actions`     | JSON Array |          the verified actions found          |
+|    `unverified-actions`    | JSON Array |         the unverified actions found         |
+|      `custom-actions`      | JSON Array |           the custom actions found           |
+|     `unknown-actions`      | JSON Array |   actions the scanner couldn't understand    |
 
 ## Example usage
 

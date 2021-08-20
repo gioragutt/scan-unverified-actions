@@ -1,39 +1,31 @@
+import {readFileSync} from 'fs';
+import mockFs from 'mock-fs';
+import {WorkflowFile} from './types';
 import {
-  isUnverifiedAction,
-  readWorkflows,
+  checkVerification,
   parseWorkflowFiles,
   ParseWorkflowFilesOutput,
+  readWorkflows,
 } from './utils';
-import mockFs from 'mock-fs';
-import {readFileSync} from 'fs';
-import {WorkflowFile} from './types';
 
-describe('isUnverifiedAction=false', () => {
-  it.each([
-    'actions/setup-go-environment',
-    'actions/first-interaction',
-    'actions/cache',
-    'actions/upload-a-build-artifact',
-    'actions/download-a-build-artifact',
-    'actions/setup-net-core-sdk',
-    'actions/close-stale-issues',
-    'actions/setup-node-js-environment',
-    'actions/setup-node',
-  ])('%s', async action => {
-    expect(await isUnverifiedAction(action)).toBe(false);
-  });
-});
-
-describe('isUnverifiedAction=true', () => {
-  it.each(['gioragutt/scan-unverified-actions'])('%s', async action => {
-    expect(await isUnverifiedAction(action)).toBe(true);
+describe('checkVerification', () => {
+  test.each`
+    action                                                       | result
+    ${'definitely/not-a-real-github-action'}                     | ${'not-found'}
+    ${'gioragutt/ngx-plugin-modules'}                            | ${'not-found'}
+    ${'actions/setup-node-js-environment'}                       | ${'verified'}
+    ${'actions/setup-node'}                                      | ${'verified'}
+    ${'gioragutt/scan-unverified-actions'}                       | ${'unverified'}
+    ${'angular/dev-infra/github-actions/breaking-changes-label'} | ${'custom-action'}
+  `(`$action is $result`, async ({action, result}) => {
+    expect(await checkVerification(action)).toBe(result);
   });
 });
 
 describe('readWorkflows', () => {
   afterEach(() => mockFs.restore());
 
-  it('no such dir', async () => {
+  test('no such dir', async () => {
     mockFs({
       'not-workflows': {},
     });
@@ -41,7 +33,7 @@ describe('readWorkflows', () => {
     await expect(readWorkflows('.github/workflows')).rejects.toBeTruthy();
   });
 
-  it('empty directory', async () => {
+  test('empty directory', async () => {
     mockFs({
       '.github/workflows': {},
     });
@@ -49,7 +41,7 @@ describe('readWorkflows', () => {
     expect(await readWorkflows('.github/workflows')).toEqual([]);
   });
 
-  it('valid file', async () => {
+  test('valid file', async () => {
     mockFs({
       '.github/workflows': {
         'flow.yml': mockFs.bypass(() =>
@@ -77,7 +69,7 @@ describe('readWorkflows', () => {
 });
 
 describe('parseWorkflowFiles', () => {
-  it('test', () => {
+  test('parse correctly', () => {
     const workflows: WorkflowFile[] = [
       {
         filename: 'a.yml',
