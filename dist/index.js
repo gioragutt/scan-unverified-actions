@@ -10237,7 +10237,7 @@ var __awaiter = (undefined && undefined.__awaiter) || function (thisArg, _argume
 
 
 
-const WORKFLOWS = './github/workflows';
+const WORKFLOWS = './.github/workflows';
 function readWorkflows() {
     return __awaiter(this, void 0, void 0, function* () {
         const files = yield external_fs_.promises.readdir(WORKFLOWS);

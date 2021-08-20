@@ -1,6 +1,7 @@
 name: Find Unverified Actions
 
 on:
+  push:
   workflow_dispatch:
 
 jobs:
@@ -12,7 +13,7 @@ jobs:
       # you must check out the repository
       - name: Checkout
         uses: actions/checkout@v2
-      
+
       - name: Find unverified actions
         uses: ./ # Uses an action in the root directory
         id: hello

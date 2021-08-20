@@ -5,7 +5,7 @@ import {load} from 'js-yaml';
 import fetch from 'node-fetch';
 import {join} from 'path';
 
-const WORKFLOWS = './github/workflows';
+const WORKFLOWS = './.github/workflows';
 
 interface WorkflowFile {
   filename: string;
