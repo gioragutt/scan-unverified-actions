@@ -1,6 +1,6 @@
 # scan-unverified-actions
 
-This action scans actions used in your workflow files and those that are unverified by github.
+This action scans actions used in your workflow files and outputs those that are unverified by github.
 
 ## Inputs
 
