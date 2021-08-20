@@ -1,7 +1,7 @@
 {
-  "name": "hello-world-javascript-action",
+  "name": "scan-unverified-actions",
   "version": "1.0.0",
-  "description": "Repo to learn how to write a javascript github action",
+  "description": "Github Action that scans workflows for unverified actions",
   "main": "dist/index.js",
   "scripts": {
     "bundle": "ncc build index.ts --license licenses.txt",

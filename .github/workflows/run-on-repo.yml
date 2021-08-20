@@ -1,0 +1,30 @@
+name: Find Unverified Actions
+
+on:
+  push:
+  workflow_dispatch:
+    inputs:
+      repo:
+        description: Repo to run the pipeline on
+        required: true
+
+jobs:
+  job:
+    runs-on: ubuntu-latest
+    name: Find unverified actions
+    steps:
+      # To use this repository's private action,
+      # you must check out the repository
+      - name: Checkout
+        uses: actions/checkout@v2
+        with:
+          repository: ${{ github.event.inputs.repo }}
+
+      - name: Find unverified actions
+        uses: gioragutt/scan-unverified-actions@1
+        id: scan
+
+      - name: Print output
+        run: |
+          echo "Found? ${{ steps.scan.outputs.found-verified-actions }}"
+          echo "Output ${{ steps.scan.outputs.unverified-actions }}"
